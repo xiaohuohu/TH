@@ -1,0 +1,166 @@
+/*******************  CNC502C-A01********************/
+A.2018.9.20
+1.由该项目由BZ001C138A CNC502B-A00项目U.2018.9.20版本开发
+
+B.2019.1.21
+测试程序平台
+
+C.2019.1.23
+1.删除测试程序  ，新建CNC502C文件夹
+2.放入2440工程APP,INC，VMOTION文件
+3.在inclues.h时加入//标准头文件 //ZYNQ头文件
+4.加入INC头文件，去除库中重复的头文件
+（1）去掉rect.h
+(2)去掉point.h
+(3)去掉XMS.H，   
+//(4)去掉BMP.H,BMP。C ，不包含BMP.H, 增加graphics.h,graphics.c 代替  BMP.C和BASE.H 和BASE .C中的图形处理函数 
+(5)去掉DISPFile.H ，DISPFile.C
+(6)去掉filefrm.c filefrm.h
+(7)去掉MachPara.c,machpara.h
+(8)去掉应用程序中的CTimer.c,CTimer.h
+(9)去掉 my_in.c
+(10)去掉Net_ftp.c
+（11）去掉parasetold.c parasetold.h
+(12)去掉sysparaold.c  sysparaold.h
+(13)去掉usb.c
+(14)去掉nat.h；
+
+D.2019.1.23
+5.调试BASE.H
+6.调试VMotion文件夹
+7.keyinfo.h,增加基础键值定义
+
+8.language.c 
+9.mergepack.c
+10.注意.h,.c用大写编译器不识别
+11.Enable_ADT834INT();   //该函数会死机 // 该函数最新库以更新可以使用，用于插补结速给中断
+12.InstallDriverInterrupt   //该函数会死机
+13.注意文件路径要加0: 1: 2: 表示第1第2第3个盘
+14.CTeach_DisplayLine 中使用 memcpy 会死机
+15.f_mkdir  建文夹函数，文件名后不要加\\ 两反斜杠
+16.配置lscript.ld  堆和栈的空间
+17.调试telcom.c 更改CTelCom_GetChar 用于测试旋钮AD值输入
+18.调试telcom.c，更改CTelCom_SendChar用于键盘LED灯控制
+19.调试屏保 编写InitDispBMP 兼容函数
+20.调试加密狗，数据 存在铁电中
+21.进入文件管理界面后，出现参数数据乱码，但参数文件没有被改变，怀凝是异常造成ltoa错误
+22. strtool.h的isascii重复定义
+23.  插补函数结束后没有给  gMoveStopSEM 信号量，inp_t_move信号量等待改成延时1毫秒
+
+F.2019.2.28
+1.更改升级 THMOTION.为最新算法
+
+
+G。2019.3.7
+1.更改1.42库，解决FPGA 2008版读版本问题，去掉串口缓存，提高测试旋钮的串口响应，解决插入中断问题 
+ 
+
+H.2019.3.14
+1.更新1.43库 优化CDC_LOCKSRC(); 锁屏的效率
+2.更改base.c  Check_Key_Task   的长按响应时间和单次按键滤波
+
+
+//***********************  TH08HB-A01 **********************//
+
+C.2009.3.21
+更新原APP，保留MAIN.C ，更新原INC保留 INCLUDES.H ,INC还有keyinfo.h在原include外需要增加
+（1）去掉rect.h
+(2)去掉point.h
+(3)去掉XMS.H，   
+(4)去掉th836.H
+(5)去掉th836.H
+(6)将bmp.h bmp.c 文件名改成 bmp1.h,bmp1.c
+(7)增加InputValueMap.h在原APP中
+（8）暂时去掉#include	"telcom.h"
+（9）更新CNC502C ,language.h language.c 
+(10)更新CNC502C，的 DISPdir.h DISPdir.c 对一些键值与显示函数进行更改   （后期需调整理）
+(11)去掉DISPFile.H ，DISPFile.C
+（12）更新CNC502C MergePack.h MergePack.c
+(13)去掉autoprogram.h， autoprogram.c
+(14)更改base.h base.c 
+(15)更改 bmp1.h,bmp1.c
+(16)更改data.c data.h 文件
+（17）更改main.c文件
+（18）去掉应用程序中的CTimer.c,CTimer.h
+（19）去掉my_in.c
+(20)更新runtask.c
+(21)去掉USB.C
+(22)去掉usbtest。h,usbtest.c
+
+(23)base.h.base.c 中增加min max ps_debugout Uart_Printf 
+(24)对一些未定义函数进行更改
+(25)需要查一下Lcd_MoveViewPort是什么函数 
+编译通过
+
+D.2019.4.1
+1。更新，CNC502C 的StrTool.c 解决进入文件管理出来字符乱码的错误
+2.检查更新原main
+3.更改使用 memcpy死机问题。
+4.techfrm.c GBK乱码问题，解决方法，将该文件设置成GBK,将原来正常的文件内容拷贝一份进去。
+5.
+
+E.2019.4.25
+1.更新LIB  更改中断牌号电平,可改屏保不能关屏问题，并提供A9_2440_SetMachineType 机型选择
+2.CDC_Init(2);参数为2，800*480，CDC_Init 会引起闪屏，在后加关屏，延时100毫秒
+3.更改BMP1.C中结构定义的不兼容问题
+4.增加轴映射功能
+5.
+
+F.2019.5.15
+1.更改更新LIB 1.47版本，防止上电闪屏，BIOS 2.41 的需要更新配合使用。 FPGA版本为3001
+2.更改DARKBLUECOLOR色值使其和TH08HA一样
+3.更改加工计数浮动的问题
+4.A9平台时间错误时，时间会有不走的现象，更改加密狗时间处理方法
+
+G.2019.7.8
+1.增加万能客户功能  
+（1）编辑密码
+（2）送线清零
+（3）检长补偿功能
+
+H.2019.8.9
+1.更新LIB 1.50库，解决坐标跳闪的问题
+2.更新项目信息项目号
+3.增加开机启动画面
+
+
+
+//***********************  YF-TH08HB-A01 **********************//
+
+A.2019.9.17   更改YF-TH08HA-C03项目到A9
+
+更新原APP，保留MAIN.C ，更新原INC保留 INCLUDES.H ,INC还有keyinfo.h在原include外需要增加
+（1）去掉rect.h
+(2)去掉point.h
+(3)去掉XMS.H，   
+(4)去掉th836.H
+(5)去掉th836.H
+(6)将bmp.h bmp.c 文件名改成 bmp1.h,bmp1.c,  并对内容进行移植
+(7)去掉ctrlcard.h ctrlcard.c 中探针的相关函数 
+(8)更改base.h base.c 
+(9)更改keyinfo.h键值定义
+(10)增加Hzk48Code.h定义 
+(11)更新TH08HB ,language.h language.c 
+(12)更新TH08HB，的 DISPdir.h DISPdir.c 对一些键值与显示函数进行更改  
+(13)去掉DISPFile.H ，DISPFile.C
+（13）更新TH08HB MergePack.h MergePack.c
+（14）去掉应用程序中的CTimer.c,CTimer.h
+（15）去掉my_in.c
+(21)去掉USB.C
+(22)去掉usbtest。h,usbtest.c
+(23)去掉DEL.H  DEL.C
+(24)更改data.h data.c
+(25)更新原main.c
+(26)更新dog.c 和A9平台时间错误时，时间会有不走的现象，更改加密狗时间处理方法
+(27)对一些未定义函数进行更改
+(28)需要查一下Lcd_MoveViewPort是什么函数 ????????
+编译通过
+1。更新，CNC502C 的StrTool.c 解决进入文件管理出来字符乱码的错误
+3.更改使用 memcpy死机问题。
+4.增加轴映射功能                                        注:未加
+
+
+
+
+
+

@@ -1,0 +1,9 @@
+FPGA 	VER: 1014
+
+CPLD 	VER: 1001
+
+LIB	VER: 6014
+
+MOTION 	VER: 8018
+
+¿ª·¢¿â°æ±¾£º101
