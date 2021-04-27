@@ -2,7 +2,8 @@
 #include	"ledout.h"
 
 TEST_EXT	OS_EVENT	*LedOutQueue;
-
+WORK_EXT	INT16S		g_iErrorNo;
+extern  	BASEINI 	g_Ini;
 void  LedOut_Task(void *data)
 {
 	INT8U  err;
@@ -20,5 +21,7 @@ void  LedOut_Task(void *data)
 		}
 		else
 			OSTimeDly(30);
+		if(g_Ini.iWarningOut==1&&g_iErrorNo)WriteBit(O_WARNING,OPEN);
+		else WriteBit(O_WARNING,0);
 	}
 }

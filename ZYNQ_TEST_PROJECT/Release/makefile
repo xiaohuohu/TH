@@ -54,7 +54,7 @@ clean:
 	-@echo ' '
 
 post-build:
-	-bootgen -image D:\qt_linux\TH\A9\YF_TH08HB_A01\2020.12.2\ZYNQ_TEST_PROJECT\bootimage/ZYNQ_TEST_PROJECT.bif -o D:\qt_linux\TH\A9\YF_TH08HB_A01\2020.12.2\ZYNQ_TEST_PROJECT\bootimage/A9Rom.bin -w
+	-bootgen -image D:\qt_linux\TH\A9\YF_TH08HB_A01\2021.4.25\ZYNQ_TEST_PROJECT\bootimage/ZYNQ_TEST_PROJECT.bif -o D:\qt_linux\TH\A9\YF_TH08HB_A01\2021.4.25\ZYNQ_TEST_PROJECT\bootimage/A9Rom.bin -w
 	-@echo ' '
 
 secondary-outputs: $(ELFSIZE)

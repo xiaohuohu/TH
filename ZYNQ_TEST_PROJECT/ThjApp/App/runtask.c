@@ -886,6 +886,7 @@ void    Run_CheckIO_Task(void *data)
 					WriteBit(O_SENDADD,0);
 
 				OSQPost(MsgQueue,g_bEnglish?"Broken Wire Warning!":"断线报警!加工暂停...");
+
 			}
 		}
 
@@ -899,6 +900,7 @@ void    Run_CheckIO_Task(void *data)
 				WriteBit(O_SENDADD,0);
 
 			OSQPost(MsgQueue,g_bEnglish?"Foul Wire Warning!":"缠线报警!加工暂停...");
+
 		}
 
 		if(g_Ini.iPaoXian)
@@ -914,6 +916,7 @@ void    Run_CheckIO_Task(void *data)
 					WriteBit(O_SENDADD,0);
 
 				OSQPost(MsgQueue,g_bEnglish?"Exceed Wire Warning!":"跑线报警!加工暂停...");
+
 			}
 		}
 
