@@ -1,0 +1,189 @@
+
+------------------------------------------------------------------------------
+VMotion Library
+------------------------------------------------------------------------------
+(C) Ken , ADTECH  Shenzhen.China
+------------------------------------------------------------------------------
+
+Revision History
+==============================================================================
+2013.10.02	by ken
+	[FEATURE] 增加了脉冲计数偏移特性，用于解决在运动过程中设定新的位置。
+2013.09.28	by ken 
+	[FIX] 修改了送入插补数据，主轴数据为0时，自动选择长轴的计算错误，该错误会导致速度飙升。
+
+	[FEATURE] 将原来的从轴位置跟随改为时间跟随，这样做的好处是在主轴加减速阶段，从轴的加减速曲线不受影响。并且从轴采用余弦型加减速
+2013.09.31  by ken
+	[FIX] 将设定IO和探针的实例调用弹簧机原API来实现
+2013.10.26	by ken
+	[FIX]	解决在事件之间的移动数据太少的情况下，会发生速度跳跃的异常，该异常的产生是因为事件机制的处理有两个阶段，第一个是预备处理，第二个是实时处理，在实时处理以后，事件将被删除；
+而该异常表现是两个位置清除之间的移动数据太少，因为第一个事件已经被预备处理了，但移动数据太少，还没轮到实时处理时，就已经碰到第二个要处理位置清除的事件，而在枚举第二个事件的时候，由于第一个事件未被实时处理，所以枚举不出第二个事件，这样第二个事件就得不到执行，导致没执行位置清除，这样导致周期内的位置数据错误而报错。解决该问题是对事件预备处理时增加一个PCnt标志，而在枚举事件时，碰到PCnt不为0时，则继续枚举下去。
+同时也解决一个可能会出现的异常，表现在做插补分解时，如果碰到分解到最后，时间刚好为0，可能导致eventproc没有执行退出时应该做的扫描，所以在判断时间的时候增加一个else处理
+2013.11.7   by hgh
+        [FEATURE]增加从轴速度规划功能，使从轴在分段连续的情况下能够保持进给速度连续，避免了反复的加减速。
+
+2013.12.24  by hgh  
+        [FIX]  解决了从轴速度规划功能中的一个Bug：当平均速度低于系统设定的最小速度时，加速时间成负值，出现计算错误，导致系统报警。解决方法是将系统最小速度设定成根据平均速度变化的变量。
+               同时解决了因时间细分精度原因造成的无法回零点问题，解决方法是提高时间细分精度。
+
+2014.02.28  by ken
+        [Fix]经查怀疑是在同步FPGA FIFO追踪的时候，会获取到插补状态不为0，且轴没运动的情况。情况紧急，先在启动运动之前吧FIFO同步的缓存初始化，后面再细查硬件原因。经现场测试反馈正常。
+
+2014.8.19 by hyz
+	更改成6轴THMOTION.
+
+E.2014.11.25
+1.更改vm_motion_task函数中有关VM_STOP，和VM_TAGSTOP中
+的
+sta=(sta&0x7ff);
+改为sta=(sta&0x7ff)/8;
+更正急停和单条时减速错误。
+
+2.更改Init_coderfollow_T函数里的
+	double ftemp;//2014.11.25  修改float为double
+
+3.更改FollowSpeedPretreatment函数里的
+ 	double I;//2014.11.25修改float为double
+
+
+F.2014.11.29
+1.更改VM_STOP命令 sudden_stop()为Stop1();
+
+
+G.2014.12.04
+1.在急停VM_STOP时将getindex定位到最后执行的位置
+2.	CurIndex=FIFOBUF[(FIFOCOUNT-count)&0x7ff].Index;
+更成	CurIndex=FIFOBUF[(FIFOCOUNT-count-1)&0x7ff].Index;
+不再提前切换CurIndex
+
+H.2015.1.29
+1.增加event_end函数
+	//该函数用于在缓存数据正常走完后，对剩下的或TAG前的事件进行执行。
+2.在vm_motion_task的if(!Get_QueueCount(pMQ))增加
+	等待vm_status 缓存插补结束和event_end函数对延时前的剩下事件进行执行。
+3.在在vm_motion_task的if(SYS_State==VM_TAGSTOP)	函数段的插补结束后增加
+	event_end函数对TAG前的事件进行执行。
+
+4.注意该库不支持应用软件在延时后执行vm_set_position事件。
+
+5.注意使用该库时应用程序在使用vm_get_status需放循环体内。
+如while(vm_getstatus())这种写法不是对的
+
+
+I.2015.4.17
+(1)
+增加以下函数
+int 	vm_get_errNo(void);										//获取VM库运行过程中生产的错误号，0为无错，1为速度过大
+int 	vm_clear_errNo(void);									
+//清除VM库运行过程中生产的错误号，使其为0;
+
+(2)去掉启动结束串口打印
+
+
+K.2015.05.27
+1.更改库中有关，不回零过程中，结束位置与开始位置一样时，算法速度异常的错误
+具体更改
+FollowSpeedPretreatment（）函数中的
+Currentp->axis[i].relpos浮点型与0值的比较
+
+
+L.2015.5.28
+1.更改FollowSpeedPretreatment函数中
+关于拆分时间T的运算为0的BUG，
+
+
+N.2015.07.25
+1.更改THMOTION.C，对vm_set_position为缓存空间数据的第一条数据时的错误进行更改。其更改修了正H.2015.1.29的第4条问题
+2.更改THMOTION.C，对vm_set_tag为缓存空间数据的第一条数据时的错误进行更改.其更改修了最好一行到3600设探针，计数不走的问题。
+
+
+
+O.2015.10.12
+1.更改int vm_stop(void)函数的
+
+	if(SYS_State==VM_RUN  || SYS_State==VM_TAGSTOPCMD)
+	{
+		SYS_State=VM_STOP;
+
+增加OS_ENTER_CRITICAL(); 关中断保护.
+以免在执行完if(SYS_State==VM_RUN  || SYS_State==VM_TAGSTOPCMD)被算法任务存出,
+
+2.vm_stop()函数增加超时退出保护
+
+3.vm_motion_task的检查缓存走完退出由
+
+while(vm_get_status())								//需在结束时等待缓存发完
+{
+//OSTimeDly(1);
+}
+改为
+while(vm_get_status())								//需在结束时等待缓存发完
+{
+	OSTimeDly(1);
+   	 if(FPGARATE<100)
+		SET_RANGE(100);
+}
+
+
+P.2015.12.26
+1.更改int vm_stop(int mode)函数增加停止模式
+mode 为0时表示减速停止，1时表示急停
+（一般探针使用急停模式，其他情况使用减速停止）
+
+
+Q.2015.12.28
+1.更改MaxMParaPart 设定MP缓冲区长度为 10000					
+2.增加MaxEParaPart 参数单独设计EP缓冲区为4000
+3.更改之前MaxMParaPart 用于初始EP相关的代码
+4.去掉EP 结构体中未用到的。int array[10];定义。
+应用程序需做保护性更改。vm_abs_inp_move空间用10000.也就说支持约1500行M指令。
+
+R.2016.1.6
+将库中
+typedef struct INDEXTYPE
+{
+	INT32U QueueIndex:16;
+	INT32U Index:16;											//队列索引，用于逆查询当前执行情况；
+}TIT;
+改为
+typedef struct INDEXTYPE
+{
+	INT32U QueueIndex;
+	INT32U Index;											//队列索引，用于逆查询当前执行情况；
+}TIT;
+避免vm_abs_inp_move index值溢出
+
+
+S.2016.3.25
+1.MaxMParaPart从10000改回4000减少内存申请，由于新的加工过程一次缓存120条数据而不是3条弹簧
+
+
+T.2016.4.1
+1.更改在缓存数据发送完时(如在有探针，或延时的时候)，最后10个缓存段执行的过程。
+去掉强制SET_RANGE(100)，增加急停退出机制
+
+
+T.2016.4.1_2
+1、同步四轴的THMOTION的FollowSpeedPretreatment函数的Vavrc,acc,vs,vc,ve,ftemp,maxpos定义由float改为double
+
+
+U.2017.3.3
+1.探针等急停时 VM_STOP 采用缓存自然走完，不采用Stop1，防止Stop1造成的脉冲丢失。
+
+V.2017.7.13
+1.更改
+event_end中的_T_POSSET动作，由原来的位置直接设置0，改为位置设偏差，避免程序解析在前10段缓存里设延时有设置0出错的问题。
+2.注意在单条加工结束退出while(vm_get_status())时，要加一毫秒的延时。
+
+W.2018.5.2
+1.更改在event_end函数的 case _T_TAGSET;中增加CurIndex = 0;
+//加工结束，时CurIndex设置为0,(当前的执行行号)为解决在加工一开始就设置延时时，
+下一条弹簧走到该延时CurIndex为最后一行，导致，送线轴坐标计算错误。
+
+
+
+V.2018.5.5
+1.更改FollowSpeedPretreatment函数if(fabs(Currentp->axis[i].relpos)>0.001)判断精度为0.0001，解决打探针时往回走一个脉冲，使的脉冲丢时的情况（特殊）
+2.更改inp_t_move函数中ftemp的判断精度为0.000002解决300转运行速度丢脉冲问题,0.000001打探针会出现位置速度溢出（特殊）
+
+
