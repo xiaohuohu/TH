@@ -1,0 +1,135 @@
+/*******************  CNC502C-A01********************/
+A.2018.9.20
+1.由该项目由BZ001C138A CNC502B-A00项目U.2018.9.20版本开发
+
+B.2019.1.21
+测试程序平台
+
+C.2019.1.23
+1.删除测试程序  ，新建CNC502C文件夹
+2.放入2440工程APP,INC，VMOTION文件
+3.在inclues.h时加入//标准头文件 //ZYNQ头文件
+4.加入INC头文件，去除库中重复的头文件
+（1）去掉rect.h
+(2)去掉point.h
+(3)去掉XMS.H，   
+//(4)去掉BMP.H,BMP。C ，不包含BMP.H, 增加graphics.h,graphics.c 代替  BMP.C和BASE.H 和BASE .C中的图形处理函数 
+(5)去掉DISPFile.H ，DISPFile.C
+(6)去掉filefrm.c filefrm.h
+(7)去掉MachPara.c,machpara.h
+(8)去掉应用程序中的CTimer.c,CTimer.h
+(9)去掉 my_in.c
+(10)去掉Net_ftp.c
+（11）去掉parasetold.c parasetold.h
+(12)去掉sysparaold.c  sysparaold.h
+(13)去掉usb.c
+(14)去掉nat.h；
+
+D.2019.1.23
+5.调试BASE.H
+6.调试VMotion文件夹
+7.keyinfo.h,增加基础键值定义
+
+8.language.c 
+9.mergepack.c
+10.注意.h,.c用大写编译器不识别
+11.Enable_ADT834INT();   //该函数会死机 // 该函数最新库以更新可以使用，用于插补结速给中断
+12.InstallDriverInterrupt   //该函数会死机
+13.注意文件路径要加0: 1: 2: 表示第1第2第3个盘
+14.CTeach_DisplayLine 中使用 memcpy 会死机
+15.f_mkdir  建文夹函数，文件名后不要加\\ 两反斜杠
+16.配置lscript.ld  堆和栈的空间
+17.调试telcom.c 更改CTelCom_GetChar 用于测试旋钮AD值输入
+18.调试telcom.c，更改CTelCom_SendChar用于键盘LED灯控制
+19.调试屏保 编写InitDispBMP 兼容函数
+20.调试加密狗，数据 存在铁电中
+21.进入文件管理界面后，出现参数数据乱码，但参数文件没有被改变，怀凝是异常造成ltoa错误
+22. strtool.h的isascii重复定义
+23.  插补函数结束后没有给  gMoveStopSEM 信号量，inp_t_move信号量等待改成延时1毫秒
+
+F.2019.2.28
+1.更改升级 THMOTION.为最新算法
+
+
+G。2019.3.7
+1.更改1.42库，解决FPGA 2008版读版本问题，去掉串口缓存，提高测试旋钮的串口响应，解决插入中断问题 
+ 
+
+H.2019.3.14
+1.更新1.43库 优化CDC_LOCKSRC(); 锁屏的效率
+2.更改base.c  Check_Key_Task   的长按响应时间和单次按键滤波
+
+
+
+//**************************CNC820C-A01 ************************************//
+
+C.2019.4.4
+（1）去掉rect.h
+(2)去掉point.h
+(3)去掉XMS.H，   
+(4)去掉th836.H
+(5)去掉th836.H
+(6)将bmp.h bmp.c 文件名改成 bmp1.h,bmp1.c
+(7)更改ctrlcard.h,ctrlcard.c 去掉探针相关函数
+（8）暂时去掉#include	"telcom.h"
+(9)更改base.h base.c 
+（10）keyinfo.h 增加原key.h中的基础键值定义
+(11)更新CNC502C，的 DISPdir.h DISPdir.c 对一些键值与显示函数进行更改   （后期需调整理）
+（12）更新CNC502C ,language.h language.c 
+(13)去掉DISPFile.H ，DISPFile.C
+(14)更改base.h base.c 
+(15)更改 bmp1.h,bmp1.c
+(16)更改data.c data.h 文件
+（17）更改main.c文件
+（18）去掉应用程序中的CTimer.c,CTimer.h
+（19）去掉my_in.c
+(20)更改 paraset.h宏保护错误
+（21）去掉sysparaold.h ,sysparaold.o.
+(22)添加telcom.h telcom.c   serial.h
+(23)去掉USB.C
+(23)base.h.base.c 中增加min max ps_debugout Uart_Printf 
+(24)对一些未定义函数进行更改
+（25）更改base.c  Check_Key_Task   的长按响应时间和单次按键滤波
+(26)更新，先亮屏在，加载资源包，
+(27)更新，CNC502C 的StrTool.c 解决进入文件管理出来字符乱码的错误
+
+28.更新 原来的main.c文， 
+29。更改使用 memset死机问题。
+30.techfrm.c GBK乱码问题，解决方法，将该文件设置成GBK,将原来正常的文件内容拷贝一份进去。
+
+
+D.2019.7.9
+1.更改更新LIB 1.47版本防止TH08HB上电闪屏，BIOS 2.10的需要更新配合使用。FPGA为3001
+2.更改A9平台下时间错误时，时间不变，加密狗天数不会减小的BUG
+3.增加轴映射功能
+
+万能4轴功能
+4.送线清零输出   7号气缸0.5秒，用于清线架报警
+5.增加编辑密码功能
+
+万能6轴功能
+1.增加转线轴名
+2.增加A轴手动控制转线，IO点是YLMT+YLMT-
+3.增加在归零是碰限位自动往反方向搜原点。
+4.增加安全门报警，在报警时可进行手动操作。
+5.更改兼容万能客户型号"CNC820","CNC428","CNC335","CNC625","CNC635","CNC650","TK335"
+6.更新 LIB 1.50  解决坐标跳闪问题
+7.更新项目信息项目号
+
+
+
+***************  BB016A005B_CNC820C-A01  *******************
+
+E.2019.8.23
+1.该项目来原于 BB016A006B_CNC820C-B01	D.2019.7.9版本
+2.更改项目号，
+3.限定轴数为4轴
+4.参数显示改为四轴
+5.更改CDC.H色值 
+6.调整坐标和寸动位置显示 
+7.更改目标产量为0，退出加工不提示产量
+
+@//注：工作参数少X列表整体偏移，系统参数少延时补偿功能 
+
+
+

@@ -1,0 +1,13 @@
+/.metadata/
+RemoteSystemsTempFiles
+WORKSPACE/
+*.log
+*.o
+*.bat
+*.orig
+# Qt build files
+/build-ZM650-Qt*/
+/build_ZM650_Qt*/
+/linux_debug/
+# Private dirs
+/Private/
